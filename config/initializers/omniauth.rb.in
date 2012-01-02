@@ -1,0 +1,7 @@
+# Declare your application onto OSM website
+# then replace here by your own authentication
+# parameters
+Rails.application.config.middleware.use OmniAuth::Builder do
+  provider :osm, "app_key", "app_secret"
+end
+

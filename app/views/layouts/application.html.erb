@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Randonnae</title>
+    <%= stylesheet_link_tag    "application" %>
+    <%= javascript_include_tag "application" %>
+    <%= csrf_meta_tags %>
+  </head>
+  <body>
+    <div id="background-wrap">
+    <%= image_tag "/assets/bg.jpg" %>
+    </div>
+    <div id="container">
+
+      <div id="user_nav">
+        <% if current_user %>
+          Hey <%= current_user.name %> !
+          <%= image_tag current_user.avatarurl if current_user.avatarurl %>
+          <br/>
+          <%= link_to "Sign out", signout_path %>
+        <% else %>
+          <a href="/auth/osm">
+            <%= image_tag "/assets/osm.png" %>
+            Sign in with your OSM account
+          </a>
+      <% end %>
+      </div>
+      <%= yield %>
+    </div>
+  </body>
+</html>

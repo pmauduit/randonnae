@@ -1,0 +1,18 @@
+<h1>Randonnae</h1>
+
+<p><b>Randonnae</b> is a web application written in
+Ruby-On-Rails, that aims to provide a nice and easy way to store pictures taken
+during a trek, and to display them with the according GPS trace on a slippy
+map.</p>
+
+<% if current_user %>
+
+  <p>Hey <%=current_user.name %> ! Why not dropping a zip file containing a GPX and your photos ?</p>
+
+<%else %>
+
+  <p> In order to be able to use the application, you will need to <%= link_to "authenticate
+   using Oauth and your OpenStreetMap account", "/auth/osm" %></p>
+
+<% end %>
+

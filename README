@@ -1,0 +1,22 @@
+== Randonnae
+
+Randonnae (maybe from Latin language, should signify something like "Hiking",
+but not sure ...) aims to be a Ruby On Rails application to nicely displays
+your treks onto a slippy map, by uploading a zip file containing photos and a
+GPX file.
+
+
+== Why such an app ?
+
+Because I was unhappy with viking desktop application (which is great anyway),
+but I could not manage to have it printing my pictures as I wanted.
+
+And ... because I just switched job and my next tasks would involve ruby / ruby
+on rails, and I still don't know anything about the marvelous but huge world
+around the ruby community.
+
+== Aknowledgements
+
+Francois, because I'm squatting his own server, Pierre for all the wonderful
+treks we did in the Alps, Camptocamp for giving me some hints around geospatial
+and computer science, and all the others I forgot ...
