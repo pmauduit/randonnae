@@ -31,24 +31,38 @@ a {
 }
 
 #user_nav {
-  width: 150px;
+  width: 400px;
   float: right;
 }
+#user_nav img {
+  vertical-align: top;
+}
+div#user_infos {
+  float:left;
+  width:200px;
+}
+div#user_avatar {
+  float:right;
+  width:200px;
+}
+
 
 #container {
   width: 75%;
   margin: 0 auto;
   background-color: #FFF;
-  padding: 20px 40px;
+  padding: 20px;
   border: solid 1px black;
   margin-top: 20px;
   position: relative;
+  padding-bottom: 200px;
+  padding-top: 40px;
 }
 
 #flash_notice, #flash_error, #flash_alert {
   padding: 5px 8px;
-  margin: 10px 0;
-  margin-right: 150px;
+  margin: 10px;
+  margin-right: 350px;
 }
 
 #flash_notice {

@@ -4,3 +4,5 @@ log/*.log
 tmp/
 .sass-cache/
 config/initializers/omniauth.rb
+uploads/
+*.swp

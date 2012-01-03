@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  has_many :treks
   def self.create_with_omniauth(auth)
     create! do |user|
       user.uid = auth["uid"]

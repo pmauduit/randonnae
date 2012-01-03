@@ -14,18 +14,27 @@
 
       <div id="user_nav">
         <% if current_user %>
-          Hey <%= current_user.name %> !
-          <%= image_tag current_user.avatarurl if current_user.avatarurl %>
-          <br/>
-          <%= link_to "Sign out", signout_path %>
+          <div id="user_infos">
+            <b><%= current_user.name %></b>
+            <br/>
+            <%= link_to "Sign out", signout_path %>
+          </div>
+          <div id="user_avatar">
+            <%= image_tag current_user.avatarurl if current_user.avatarurl %>
+          </div>
         <% else %>
           <a href="/auth/osm">
             <%= image_tag "/assets/osm.png" %>
             Sign in with your OSM account
           </a>
       <% end %>
-      </div>
-      <%= yield %>
+    </div>
+    <% flash.each do |name, msg| %>
+      <%= content_tag :div, msg, :id => "flash_#{name}" %>
+    <% end %>
+    <%= content_tag :h1, yield(:title) if show_title? %>
+
+    <%= yield %>
     </div>
   </body>
 </html>

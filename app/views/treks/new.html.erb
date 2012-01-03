@@ -1,0 +1,17 @@
+<% if current_user %>
+  <h1>New trek</h1>
+
+  <p>
+  <%= form_for @trek do |t| %>
+
+    <%= t.label :title, "Title" %>
+    <%= t.text_field :title %><br/>
+    <%= t.label :asset, "File (zip containing GPX and pictures)" %>
+    <%= t.file_field :asset %><br/>
+    <%= t.submit %>
+  <% end %>
+ </p>
+
+
+
+<% end %>

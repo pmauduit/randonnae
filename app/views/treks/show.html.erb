@@ -1,0 +1,11 @@
+<% title @trek.title %>
+
+<p><%= link_to "Back to treks", treks_path %></p>
+
+<p>Trek submitted by <%= link_to @user.name, '/treks/user/' + @user.id.to_s %></p>
+<p><%= @trek.nb_images %> images in this set.</p>
+
+<% if current_user.id == @user.id %>
+  <%= button_to "Remove trek", { :action => "destroy", :id => @trek.id },
+            :confirm => "Are you sure?", :method => :delete %>
+<% end %>
