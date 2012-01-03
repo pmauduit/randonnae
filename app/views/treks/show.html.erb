@@ -1,11 +1,28 @@
 <% title @trek.title %>
 
+<%= javascript_include_tag "/OpenLayers.js"  %>
+<%= javascript_include_tag "/trek-app.js" %>
+
+<%= stylesheet_link_tag "trek.css" %> 
+
 <p><%= link_to "Back to treks", treks_path %></p>
 
 <p>Trek submitted by <%= link_to @user.name, '/treks/user/' + @user.id.to_s %></p>
 <p><%= @trek.nb_images %> images in this set.</p>
 
-<% if current_user.id == @user.id %>
+<script language="javascript">
+  Trek = {};
+  Trek.gpx = "<%= @trek.gpx_url %>";
+</script>
+
+<h3>Map</h3>
+
+<div id="map">
+</div>
+
+<% if current_user && current_user.id == @user.id %>
+  <h3>Delete trek</h3>
+  <br/>
   <%= button_to "Remove trek", { :action => "destroy", :id => @trek.id },
             :confirm => "Are you sure?", :method => :delete %>
 <% end %>

@@ -23,4 +23,9 @@ class Trek < ActiveRecord::Base
   end
 
 
+  def gpx_url
+    return "/treks/%d/gpx" % [self.id]
+  end
+
+
 end
