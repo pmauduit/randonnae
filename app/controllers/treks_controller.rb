@@ -73,7 +73,11 @@ class TreksController < ApplicationController
 
   def show
     @trek = Trek.find_by_id(params[:id])
-    @user = User.find_by_id(@trek.user_id)
+    if @trek
+      @user = User.find_by_id(@trek.user_id)
+    else
+      redirect_to treks_path, :alert => "Trek not found."
+    end
   end
 
   def getgpx

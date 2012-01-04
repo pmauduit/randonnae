@@ -16,3 +16,11 @@ map.</p>
 
 <% end %>
 
+<% if @last_ten_treks %>
+<h3>Last added treks</h3>
+  <ul id="treks">
+    <% @last_ten_treks.each do |c| %>
+      <li><%= link_to c.title, {:controller => 'treks', :action => 'show', :id => c.id} -%></li>
+    <% end %>
+  </ul>
+<% end %>
