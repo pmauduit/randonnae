@@ -8,7 +8,7 @@ class TreksController < ApplicationController
   end
 
   def indexbyuser
-    @treks = Trek.find_by_user(:id)
+    @treks = Trek.find_by_user_id(:id)
   end
 
   def new
@@ -20,10 +20,6 @@ class TreksController < ApplicationController
   end
 
   def create
-
-    # bad practice I guess,
-    # should refactor and avoid copy/paste
-
     if current_user == nil
       redirect_to root_url, :alert => "You need to log in before
                   trying to add a trek !"
@@ -82,22 +78,14 @@ class TreksController < ApplicationController
 
   def getgpx
     trek = Trek.find_by_id(params[:id])
-    trekPath =  File.join(Rails.root, "uploads", trek.user_id.to_s, trek.id.to_s)
-
-    Find.find(trekPath) do |path|
-      if FileTest.directory?(path)
-        if File.basename(path)[0] == ?.
-          Find.prune       # Don't look any further into this directory.
-        else
-          next
-        end
-      else
-        if File.basename(path).end_with?(".gpx")
-          return send_file path, :type => "text/xml", :disposition => "inline"
-        end
-      end
-    end
+    return send_file trek.get_gpx(), :type => "text/xml", :disposition => "inline"
   end
+
+  def getimagesinfo
+    trek = Trek.find_by_id(params[:id])
+    send_data trek.get_images_info.to_json, :disposition => "inline"
+  end
+
 
   def destroy
     if current_user == nil

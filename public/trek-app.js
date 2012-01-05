@@ -50,7 +50,7 @@ $(document).ready(function() {
     Trek.gpx_layer = new OpenLayers.Layer.GML("Trek", Trek.gpx, {
         format: OpenLayers.Format.GPX,
         style: {
-          strokeColor: "black",
+          strokeColor: "#c62828",
           strokeWidth: 4,
           strokeOpacity: 1
         },

@@ -5,6 +5,8 @@ Randonnae::Application.routes.draw do
   match "/signout" => "sessions#destroy", :as => :signout
 
   match "/treks/:id/gpx" => "treks#getgpx"
+  match "/treks/:id/imgs" => "treks#getimagesinfo"
+  match "/users/:id/treks" => "treks#indexbyuser"
 
   resources :treks
 end
