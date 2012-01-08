@@ -1,5 +1,6 @@
 require 'zipruby'
 require 'find'
+require 'RMagick'
 
 class TreksController < ApplicationController
 
@@ -8,8 +9,32 @@ class TreksController < ApplicationController
   end
 
   def indexbyuser
-    @treks = Trek.find_by_user_id(:id)
+    @treks = Trek.find(:all, :conditions => "user_id = %d" [params["id"].to_s], :order => "id DESC")
+    render :template => 'treks#index'
   end
+
+  def getimage
+    @trek = Trek.find(params[:id])
+    if @trek == nil
+      redirect_to treks_path, :alert => "Trek not found."
+    end
+   send_file @trek.get_img_path(params[:name] + "." + params[:format]), 
+        :type => "image/jpeg",
+        :disposition => "inline"
+  end
+
+  def getthumbnail
+    @trek = Trek.find(params[:id])
+    if @trek == nil
+      redirect_to treks_path, :alert => "Trek not found."
+    end
+    img = Magick::Image.read(@trek.get_img_path(params[:name] + "." + params[:format])).first
+    thumb = img.resize_to_fill(75, 75)
+    send_data thumb.to_blob, :type => "image/jpeg", :disposition => "inline"
+  end
+
+
+
 
   def new
     if current_user == nil
@@ -27,15 +52,12 @@ class TreksController < ApplicationController
     @trek = Trek.new
     @trek.user_id = current_user.id
     @trek.title   = params["trek"]["title"]
-
     if @trek.save
       flash[:notice] = "Successfully created the trek."
-
       # save ZIP file somewhere
       begin
         @newDir = File.join(Rails.root, "uploads", @trek.user_id.to_s,
                                     @trek.id.to_s)
-
         FileUtils.mkdir_p @newDir
         begin
           Zip::Archive.open(params["trek"]["asset"].path) do |ar|
@@ -54,18 +76,14 @@ class TreksController < ApplicationController
             end
           end
       end
-
       rescue ex
         puts ex
       end
-
       redirect_to @trek
     else
       render :action => 'new'
     end
-
   end
-
 
   def show
     @trek = Trek.find_by_id(params[:id])

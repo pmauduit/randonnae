@@ -1,9 +1,12 @@
 <% title @trek.title %>
 
+
 <%= javascript_include_tag "/OpenLayers.js"  %>
+<%= javascript_include_tag "/jquery.jcarousel.min.js" %>
 <%= javascript_include_tag "/trek-app.js" %>
 
 <%= stylesheet_link_tag "trek.css" %> 
+<%= stylesheet_link_tag "/jcarousel.css" %> 
 
 <p><%= link_to "Back to treks", treks_path %></p>
 
@@ -12,6 +15,7 @@
 
 <script language="javascript">
   Trek = {};
+  Trek.baseUrl = "<%= @trek.base_url %>";
   Trek.gpx = "<%= @trek.gpx_url %>";
 </script>
 
@@ -20,6 +24,12 @@
 <div id="map">
 </div>
 
+<h3 id="gallery">Gallery</h3>
+<center>
+<div id="carousel" class="jcarousel-skin-tango">
+  <ul></ul>
+</div>
+</center>
 <% if current_user && current_user.id == @user.id %>
   <h3>Delete trek</h3>
   <br/>

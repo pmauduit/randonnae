@@ -13,6 +13,8 @@ gem 'omniauth-osm'
 
 gem 'paperclip'
 
+gem 'rmagick'
+
 gem 'zipruby'
 
 group :assets do

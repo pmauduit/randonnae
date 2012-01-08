@@ -6,7 +6,11 @@ Randonnae::Application.routes.draw do
 
   match "/treks/:id/gpx" => "treks#getgpx"
   match "/treks/:id/imgs" => "treks#getimagesinfo"
-  match "/users/:id/treks" => "treks#indexbyuser"
+  match "/treks/user/:id" => "treks#indexbyuser"
+
+  match "/treks/:id/picture/:name" => "treks#getimage"
+
+  match "/treks/:id/thumbnail/:name" => "treks#getthumbnail"
 
   resources :treks
 end

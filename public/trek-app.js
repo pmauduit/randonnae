@@ -62,5 +62,33 @@ $(document).ready(function() {
   }
   Trek.map.zoomTo(3);
 
+  //loading gallery
+    function carousel_getItemHTML(url) {
+      console.log(url);
+      return '<li><img src="' + url + '" alt="" width="75" height="75" /></li>';
+    };
+
+    function load_images(carousel, state) {
+      if (state != 'init') return;
+
+      $.getJSON(Trek.baseUrl + "/imgs", function(data) {
+        Trek.images = [];
+
+        $.each(data, function(key, val) {
+          Trek.images.push(val);
+        });
+
+        for (i = 0; i < Trek.images.length ; i++) {
+            carousel.add(i+1, carousel_getItemHTML(Trek.images[i].thumbnail));
+//          $('#carousel ul').append(carousel_getItemHTML(Trek.images[i].thumbnail));
+        }
+      });
+    }
+
+    $('#carousel').jcarousel({
+      itemLoadCallback: load_images
+    });
+
+
 });
 
