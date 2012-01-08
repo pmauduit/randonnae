@@ -64,7 +64,6 @@ $(document).ready(function() {
 
   //loading gallery
     function carousel_getItemHTML(url) {
-      console.log(url);
       return '<li><img src="' + url + '" alt="" width="75" height="75" /></li>';
     };
 
@@ -80,8 +79,8 @@ $(document).ready(function() {
 
         for (i = 0; i < Trek.images.length ; i++) {
             carousel.add(i+1, carousel_getItemHTML(Trek.images[i].thumbnail));
-//          $('#carousel ul').append(carousel_getItemHTML(Trek.images[i].thumbnail));
         }
+        carousel.size(Trek.images.length);
       });
     }
 

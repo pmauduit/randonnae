@@ -53,11 +53,11 @@ class Trek < ActiveRecord::Base
 
   def nb_images
     ret = 0
-    Find.find(self.get_path) do |path|
-      filename = File.basename(path).downcase
-      if filename.end_with?(".jpg")
-        ret += 1
-      end
+    gpxFile = self.get_gpx
+    if gpxFile
+      @doc = Nokogiri::XML(File.open(gpxFile))
+      wayPts = @doc.xpath '//dummy:wpt', {"dummy" => "http://www.topografix.com/GPX/1/1"}
+      ret = wayPts.length
     end
     return ret
   end
@@ -71,11 +71,8 @@ class Trek < ActiveRecord::Base
     return "/treks/%d" % [self.id]
   end
 
-
-
   def gpx_url
     return self.base_url + "/gpx"
   end
-
 
 end
