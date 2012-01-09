@@ -10,7 +10,7 @@ class TreksController < ApplicationController
 
   def indexbyuser
     @treks = Trek.find(:all, :conditions => "user_id = %d" [params["id"].to_s], :order => "id DESC")
-    render :template => 'treks#index'
+    render :index
   end
 
   def getimage

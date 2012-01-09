@@ -1,9 +1,30 @@
 
 $(document).ready(function() {
 
+  Trek.hover = function(lat, lon) {
+    if ((lat === 'undefined') || (lon === 'undefined')) {
+      return;
+    }
+    // Should not happen
+    if (Trek.poi_layer === 'undefined') {
+      return;
+    }
+    Trek.poi_layer.removeAllFeatures();
+    newGeom = new OpenLayers.Geometry.Point(lon, lat);
+    newGeom.transform(Trek.epsg4326, Trek.epsg900913);
+    newFeat = new OpenLayers.Feature.Vector(newGeom);
+    newFeat.style = {
+      'pointRadius': 10,
+      'externalGraphic': '/here.png'};
+    Trek.poi_layer.addFeatures([newFeat]);
+  }
+
+  Trek.epsg4326 = new OpenLayers.Projection("EPSG:4326");
+  Trek.epsg900913 = new OpenLayers.Projection("EPSG:900913");
   Trek.map = new OpenLayers.Map("map");
   Trek.map.addLayer(new OpenLayers.Layer.OSM());
 
+  Trek.poi_layer = new OpenLayers.Layer.Vector("Picture POIs");
 
   /* Bwah, does not work ... yet
    * Should discuss with sly around a beer
@@ -61,10 +82,13 @@ $(document).ready(function() {
     Trek.map.addLayer(Trek.gpx_layer);
   }
   Trek.map.zoomTo(3);
+  Trek.map.addLayer(Trek.poi_layer);
 
   //loading gallery
-    function carousel_getItemHTML(url) {
-      return '<li><img src="' + url + '" alt="" width="75" height="75" /></li>';
+    function carousel_getItemHTML(item) {
+      return '<li><img onmouseover="javascript:Trek.hover('+item.lat
+        + ',' + item.lon + ')" src="' 
+        + item.thumbnail + '" alt="" width="75" height="75" /></li>';
     };
 
     function load_images(carousel, state) {
@@ -78,7 +102,7 @@ $(document).ready(function() {
         });
 
         for (i = 0; i < Trek.images.length ; i++) {
-            carousel.add(i+1, carousel_getItemHTML(Trek.images[i].thumbnail));
+            carousel.add(i+1, carousel_getItemHTML(Trek.images[i]));
         }
         carousel.size(Trek.images.length);
       });

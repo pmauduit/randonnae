@@ -6,3 +6,4 @@ tmp/
 config/initializers/omniauth.rb
 uploads/
 *.swp
+.rvmrc
