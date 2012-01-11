@@ -12,11 +12,14 @@ $(document).ready(function() {
     Trek.poi_layer.removeAllFeatures();
     newGeom = new OpenLayers.Geometry.Point(lon, lat);
     newGeom.transform(Trek.epsg4326, Trek.epsg900913);
+    Trek.map.setCenter(new OpenLayers.LonLat(newGeom.x,newGeom.y));
     newFeat = new OpenLayers.Feature.Vector(newGeom);
     newFeat.style = {
-      'pointRadius': 10,
+      'pointRadius': 16,
+      'graphicYOffset': -32,
       'externalGraphic': '/here.png'};
     Trek.poi_layer.addFeatures([newFeat]);
+
   }
 
   Trek.epsg4326 = new OpenLayers.Projection("EPSG:4326");
