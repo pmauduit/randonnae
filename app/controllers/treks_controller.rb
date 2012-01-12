@@ -18,26 +18,32 @@ class TreksController < ApplicationController
     if @trek == nil
       redirect_to treks_path, :alert => "Trek not found."
     end
-   send_file @trek.get_img_path(params[:name] + "." + params[:format]), 
+   send_file @trek.get_img_path(params[:name] + "." + params[:format]),
         :type => "image/jpeg",
         :disposition => "inline"
   end
 
   def getthumbnail
     @trek = Trek.find(params[:id])
-    if @trek == nil
+    if @trek.nil?
       redirect_to treks_path, :alert => "Trek not found."
     end
-    img = Magick::Image.read(@trek.get_img_path(params[:name] + "." + params[:format])).first
-    thumb = img.resize_to_fill(75, 75)
-    send_data thumb.to_blob, :type => "image/jpeg", :disposition => "inline"
+    fname = params["name"]+"."+params["format"]
+    thumb_path = @trek.get_thumbnail(fname)
+    if thumb_path.nil?
+      img = Magick::Image.read(@trek.get_img_path(fname)).first
+      thumb = img.resize_to_fill(75, 75)
+      thumb.write(@trek.get_thumbnail_path + "/" + fname)
+      send_data thumb.to_blob, :type => "image/jpeg", :disposition => "inline"
+    else
+      send_file thumb_path, :type => "image/jpeg", :disposition => "inline"
+    end
   end
 
 
 
-
   def new
-    if current_user == nil
+    if current_user.nil?
       redirect_to root_url, :alert => "You need to log in before
                   trying to add a trek !"
     end
@@ -56,19 +62,18 @@ class TreksController < ApplicationController
       flash[:notice] = "Successfully created the trek."
       # save ZIP file somewhere
       begin
-        @newDir = File.join(Rails.root, "uploads", @trek.user_id.to_s,
+        newDir = File.join(Rails.root, "uploads", @trek.user_id.to_s,
                                     @trek.id.to_s)
-        FileUtils.mkdir_p @newDir
+        FileUtils.mkdir_p newDir
         begin
           Zip::Archive.open(params["trek"]["asset"].path) do |ar|
             ar.each do |zf|
-              curfile = File.join @newDir, zf.name
+              curfile = File.join newDir, zf.name
               if zf.directory?
                 FileUtils.mkdir_p(curfile)
               else
                 dirname = File.dirname(curfile)
                 FileUtils.mkdir_p(dirname) unless File.exist?(dirname)
-
                 open(curfile, 'wb') do |f|
                   f << zf.read
                 end
@@ -96,7 +101,7 @@ class TreksController < ApplicationController
 
   def getgpx
     trek = Trek.find_by_id(params[:id])
-    return send_file trek.get_gpx(), :type => "text/xml", :disposition => "inline"
+    send_file trek.get_gpx(), :type => "text/xml", :disposition => "inline"
   end
 
   def getimagesinfo

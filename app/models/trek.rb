@@ -1,6 +1,7 @@
 require 'find'
 require 'nokogiri'
 
+
 class Trek < ActiveRecord::Base
   belongs_to :user
   validates :title, :presence => true
@@ -38,6 +39,13 @@ class Trek < ActiveRecord::Base
     end
   end
 
+  def get_thumbnail (fname)
+     Find.find(self.get_thumbnail_path) do |path|
+      if File.basename(path) == fname
+        return path
+      end
+    end
+  end
 
   def get_gpx
     Find.find(self.get_path) do |path|
@@ -63,16 +71,26 @@ class Trek < ActiveRecord::Base
   end
 
   def get_path
-    return File.join(Rails.root, "uploads", self.user_id.to_s,
+    File.join(Rails.root, "uploads", self.user_id.to_s,
                      self.id.to_s)
   end
+  def get_thumbnail_path
+    path = File.join(Rails.root, "processed", self.user_id.to_s,
+                     self.id.to_s)
+
+    unless File.exists? path
+      FileUtils.mkdir_p path
+    end
+    path
+  end
+
 
   def base_url
-    return "/treks/%d" % [self.id]
+    "/treks/%d" % [self.id]
   end
 
   def gpx_url
-    return self.base_url + "/gpx"
+    self.base_url + "/gpx"
   end
 
 end
