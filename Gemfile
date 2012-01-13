@@ -11,8 +11,6 @@ gem 'nokogiri'
 gem 'omniauth'
 gem 'omniauth-osm'
 
-gem 'paperclip'
-
 gem 'rmagick'
 
 gem 'zipruby'

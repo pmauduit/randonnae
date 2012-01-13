@@ -1,0 +1,18 @@
+<h1>Trek listing for <%= @user.name %></h1>
+
+<% if @treks.blank? %>
+  <p>@user.name has not uploaded any trek yet.</p>
+<% else %>
+  <p>Trek listing:</p>
+  <ul id="treks">
+    <% @treks.each do |c| %>
+      <li><%= link_to c.title, {:action => 'show', :id => c.id} -%></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<%= link_to "All treks", :controller => "treks" %><br/>
+
+<% if current_user %>
+  <%= link_to "Upload a new trek", {:action => 'new'} %>
+<% end %>

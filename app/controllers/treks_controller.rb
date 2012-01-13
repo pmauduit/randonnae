@@ -4,27 +4,42 @@ require 'RMagick'
 
 class TreksController < ApplicationController
 
+  # retrieves every treks from the database
+  # TODO: pagination when the list will grow up
   def index
     @treks = Trek.all
   end
 
+  # retrieves every treks given a user id in argument
   def indexbyuser
-    @treks = Trek.find(:all, :conditions => "user_id = %d" [params["id"].to_s], :order => "id DESC")
-    render :index
+    @user = User.find_by_id params[:id]
+    unless @user.nil?
+      @treks = Trek.find_by_user params[:id]
+    else
+      redirect_to root_url, :alert => "User not found"
+    end
   end
 
+  # Sends the raw image
   def getimage
-    @trek = Trek.find(params[:id])
+    @trek = Trek.find params[:id]
     if @trek == nil
       redirect_to treks_path, :alert => "Trek not found."
     end
-   send_file @trek.get_img_path(params[:name] + "." + params[:format]),
+    filename = params[:name] + "." + params[:format]
+    send_file @trek.get_img_path(filename),
         :type => "image/jpeg",
         :disposition => "inline"
   end
 
+  # Sends a thumbnail of the image which filename
+  # is given in argument (75x75 sized)
+  # the thumbnail is generated on the fly into
+  # processed/ subdirectory if it does not exist
+  # yet, else it is sent as stored into the previous
+  # directory
   def getthumbnail
-    @trek = Trek.find(params[:id])
+    @trek = Trek.find params[:id]
     if @trek.nil?
       redirect_to treks_path, :alert => "Trek not found."
     end
@@ -40,8 +55,7 @@ class TreksController < ApplicationController
     end
   end
 
-
-
+  # Prepares the creation of a trek
   def new
     if current_user.nil?
       redirect_to root_url, :alert => "You need to log in before
@@ -50,6 +64,9 @@ class TreksController < ApplicationController
     @trek = Trek.new
   end
 
+  # Creates a new trek (entry in the database, and
+  # inflating the provided zip file into the uploads/
+  # subdirectory)
   def create
     if current_user == nil
       redirect_to root_url, :alert => "You need to log in before
@@ -60,10 +77,9 @@ class TreksController < ApplicationController
     @trek.title   = params["trek"]["title"]
     if @trek.save
       flash[:notice] = "Successfully created the trek."
-      # save ZIP file somewhere
+      # saves the ZIP file
       begin
-        newDir = File.join(Rails.root, "uploads", @trek.user_id.to_s,
-                                    @trek.id.to_s)
+        newDir = @trek.get_path
         FileUtils.mkdir_p newDir
         begin
           Zip::Archive.open(params["trek"]["asset"].path) do |ar|
@@ -81,8 +97,7 @@ class TreksController < ApplicationController
             end
           end
       end
-      rescue ex
-        puts ex
+      rescue
       end
       redirect_to @trek
     else
@@ -90,26 +105,40 @@ class TreksController < ApplicationController
     end
   end
 
+  # Show a specific trek given its id
   def show
     @trek = Trek.find_by_id(params[:id])
-    if @trek
+    unless @trek.nil?
       @user = User.find_by_id(@trek.user_id)
+      if @user.nil?
+        redirect_to treks_path,
+                    :alert => "User not found for trek #{@trek.title}."
+      end
     else
       redirect_to treks_path, :alert => "Trek not found."
     end
   end
 
+  # Gets the gpx (XML) from the trek
+  # the first file with ".gpx" extension is returned
   def getgpx
     trek = Trek.find_by_id(params[:id])
     send_file trek.get_gpx(), :type => "text/xml", :disposition => "inline"
   end
 
+  # Returns JSON infos about the pictures
+  # that accompagny the trek.
+  # Note: it is possible to provide more picture files
+  # but only the ones that are georeferenced into the GPX
+  # file are taken into account
   def getimagesinfo
     trek = Trek.find_by_id(params[:id])
     send_data trek.get_images_info.to_json, :disposition => "inline"
   end
 
-
+  # Deletes the trek which id is given as argument
+  # It removes also the files provided in the ZIP file
+  # that has been uploaded during the trek creation
   def destroy
     if current_user == nil
       redirect_to root_url, :alert => "You need to log in before
@@ -123,8 +152,9 @@ class TreksController < ApplicationController
     end
     @trek.destroy
     begin
-      FileUtils.rm_rf File.join(Rails.root, "uploads", @trek.user_id.to_s,
-                                    @trek.id.to_s)
+      # removes files associated to the trek
+      FileUtils.rm_rf @trek.get_path
+      FileUtils.rm_rf @trek.get_thumbnail_path
     rescue Error
 
     end
