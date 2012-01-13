@@ -33,6 +33,7 @@ class Trek < ActiveRecord::Base
           datetime = wpt.xpath('./gpx:time', @@gpx_namespace).first.inner_text
           elem['filename'] = '/treks/' + self.id.to_s + '/picture/' + filename
           elem['thumbnail'] = '/treks/' + self.id.to_s + '/thumbnail/' + filename
+          elem['minimage'] = '/treks/' + self.id.to_s + '/min/' + filename
           elem['lat'] = wpt['lat']
           elem['lon'] = wpt['lon']
           elem['datetime'] = datetime
@@ -54,7 +55,16 @@ class Trek < ActiveRecord::Base
 
   # Returns the thumbnail path, given its filename
   def get_thumbnail (fname)
-     Find.find(self.get_thumbnail_path) do |path|
+     Find.find(self.get_processed_path) do |path|
+      if File.basename(path) == fname
+        return path
+      end
+    end
+  end
+
+  # Returns the minified image path (900px), given its filename
+  def get_min_image (fname)
+     Find.find(self.get_processed_path) do |path|
       if File.basename(path) == fname
         return path
       end
@@ -94,10 +104,10 @@ class Trek < ActiveRecord::Base
     File.join(Rails.root, "uploads", self.user_id.to_s, self.id.to_s)
   end
 
-  # Returns the directory path of the thumbnails
+  # Returns the directory path of the cropped images
   # from the pictures belonging to the current 
   # trek
-  def get_thumbnail_path
+  def get_processed_path
     path = File.join(Rails.root, "processed", self.user_id.to_s, self.id.to_s)
     unless File.exists? path
       FileUtils.mkdir_p path

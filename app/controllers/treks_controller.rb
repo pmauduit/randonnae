@@ -48,10 +48,28 @@ class TreksController < ApplicationController
     if thumb_path.nil?
       img = Magick::Image.read(@trek.get_img_path(fname)).first
       thumb = img.resize_to_fill(75, 75)
-      thumb.write(@trek.get_thumbnail_path + "/" + fname)
+      thumb.write(@trek.get_processed_path + "/" + fname)
       send_data thumb.to_blob, :type => "image/jpeg", :disposition => "inline"
     else
       send_file thumb_path, :type => "image/jpeg", :disposition => "inline"
+    end
+  end
+
+  def getminimage
+    @trek = Trek.find params[:id]
+    if @trek.nil?
+      redirect_to treks_path, :alert => "Trek not found."
+    end
+    fname = params["name"]+"."+params["format"]
+    min_fname = params["name"]+".min."+params["format"]
+    min_path = @trek.get_min_image(min_fname)
+    if min_path.nil?
+      img = Magick::Image.read(@trek.get_img_path(fname)).first
+      min = img.resize_to_fill(600, 600)
+      min.write(@trek.get_processed_path + "/" + min_fname)
+      send_data min.to_blob, :type => "image/jpeg", :disposition => "inline"
+    else
+      send_file min_path, :type => "image/jpeg", :disposition => "inline"
     end
   end
 
@@ -154,7 +172,7 @@ class TreksController < ApplicationController
     begin
       # removes files associated to the trek
       FileUtils.rm_rf @trek.get_path
-      FileUtils.rm_rf @trek.get_thumbnail_path
+      FileUtils.rm_rf @trek.get_processed_path
     rescue Error
 
     end

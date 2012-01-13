@@ -89,9 +89,10 @@ $(document).ready(function() {
 
   //loading gallery
     function carousel_getItemHTML(item) {
-      return '<li><img onmouseover="javascript:Trek.hover('+item.lat
+      return '<li><a href='+item.minimage +'>'
+        +' <img onmouseover="javascript:Trek.hover('+item.lat
         + ',' + item.lon + ')" src="' 
-        + item.thumbnail + '" alt="" width="75" height="75" /></li>';
+        + item.thumbnail + '" alt="" width="75" height="75" /></a></li>';
     };
 
     function load_images(carousel, state) {
@@ -108,6 +109,10 @@ $(document).ready(function() {
             carousel.add(i+1, carousel_getItemHTML(Trek.images[i]));
         }
         carousel.size(Trek.images.length);
+        // Lightbox
+        $(function() {
+            $('#carousel a').lightBox({fixedNavigation:true});
+        });
       });
     }
 

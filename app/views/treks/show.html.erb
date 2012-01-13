@@ -3,14 +3,17 @@
 
 <%= javascript_include_tag "/OpenLayers.js"  %>
 <%= javascript_include_tag "/jquery.jcarousel.min.js" %>
+<%= javascript_include_tag "/lightbox/js/jquery.lightbox-0.5.min.js" %>
 <%= javascript_include_tag "/trek-app.js" %>
 
 <%= stylesheet_link_tag "trek.css" %> 
 <%= stylesheet_link_tag "/jcarousel.css" %> 
+<%= stylesheet_link_tag "/lightbox/css/jquery.lightbox-0.5.css" %> 
 
 <p><%= link_to "Back to treks", treks_path %></p>
 
-<p>Trek submitted by <%= link_to @user.name, '/treks/user/' + @user.id.to_s %></p>
+<p>Trek submitted by <%= link_to @user.name,
+                                  '/treks/user/' + @user.id.to_s %></p>
 <p><%= @trek.nb_images %> images in this set.</p>
 
 <script language="javascript">
