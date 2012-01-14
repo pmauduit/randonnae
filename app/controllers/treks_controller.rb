@@ -151,9 +151,30 @@ class TreksController < ApplicationController
   # file are taken into account
   def getimagesinfo
     trek = Trek.find_by_id(params[:id])
-    send_data trek.get_images_info.to_json, :disposition => "inline"
+    send_data(trek.get_images_info.to_json,
+              {:type => "application/json", :disposition => "inline"})
   end
 
+  # Gets the details of a trek (elevation w/ timestamp)
+  # and returns it as JSON to the browser
+  def getdetails
+    trek = Trek.find_by_id(params[:id])
+    if trek.nil?
+      redirect_to treks_path, :alert => "Trek not found."
+    end
+    ele_json = trek.get_processed_path + "/ele.json"
+    if File.exists? ele_json
+      send_file(ele_json,
+                {:type => "application/json", :disposition => "inline"})
+    else
+      ele_details = trek.get_elevation_details.to_json
+      processed_ele = File.new(ele_json, "w")
+      processed_ele.write ele_details
+      processed_ele.close
+      send_data(ele_details,
+                {:type => "application/json", :disposition => "inline"})
+    end
+  end
   # Deletes the trek which id is given as argument
   # It removes also the files provided in the ZIP file
   # that has been uploaded during the trek creation

@@ -9,3 +9,8 @@ div#background-wrap img {
   margin: auto;
   float: center;
 }
+
+.xAxis {
+  display: none;
+}
+

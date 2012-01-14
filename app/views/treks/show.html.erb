@@ -4,6 +4,7 @@
 <%= javascript_include_tag "/OpenLayers.js"  %>
 <%= javascript_include_tag "/jquery.jcarousel.min.js" %>
 <%= javascript_include_tag "/lightbox/js/jquery.lightbox-0.5.min.js" %>
+<%= javascript_include_tag "/jquery.flot.js" %>
 <%= javascript_include_tag "/trek-app.js" %>
 
 <%= stylesheet_link_tag "trek.css" %> 
@@ -33,6 +34,14 @@
   <ul></ul>
 </div>
 </center>
+
+<h3>Trek details</h3>
+<center>
+  <div id="trekdetails">
+    <div id="trekgraph" style="width: 600px; height: 300px;"></div>
+  </div>
+</center>
+
 <% if current_user && current_user.id == @user.id %>
   <h3>Delete trek</h3>
   <br/>

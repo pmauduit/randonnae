@@ -1,6 +1,6 @@
 require 'find'
 require 'nokogiri'
-
+require 'elevationparser'
 
 class Trek < ActiveRecord::Base
   belongs_to :user
@@ -31,9 +31,9 @@ class Trek < ActiveRecord::Base
           elem = Hash.new
           filename = wpt.xpath('./gpx:link/gpx:text', @@gpx_namespace).first.inner_text
           datetime = wpt.xpath('./gpx:time', @@gpx_namespace).first.inner_text
-          elem['filename'] = '/treks/' + self.id.to_s + '/picture/' + filename
-          elem['thumbnail'] = '/treks/' + self.id.to_s + '/thumbnail/' + filename
-          elem['minimage'] = '/treks/' + self.id.to_s + '/min/' + filename
+          elem['filename']  = self.base_url + '/picture/' + filename
+          elem['thumbnail'] = self.base_url + '/thumbnail/' + filename
+          elem['minimage']  = self.base_url + '/min/' + filename
           elem['lat'] = wpt['lat']
           elem['lon'] = wpt['lon']
           elem['datetime'] = datetime
@@ -43,6 +43,24 @@ class Trek < ActiveRecord::Base
     end
     return ret
   end
+
+  # Gets the elevation details, from the GPX file
+  # and returns an array of hashes containing
+  # the elevation (ele) and the timestamp (time)
+  def get_elevation_details
+    ret = Array.new
+    gpxFile = self.get_gpx
+    if gpxFile
+      eleparser = ElevationParser.new
+      parser = XML::SAX::Parser.new(eleparser)
+      parser.parse_file(gpxFile)
+      return eleparser.elevation_table
+    end
+    return ret
+  end
+
+
+
 
   # Gets the picture path, given its filename
   def get_img_path (fname)

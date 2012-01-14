@@ -13,5 +13,6 @@ Randonnae::Application.routes.draw do
   match "/treks/:id/thumbnail/:name" => "treks#getthumbnail"
   match "/treks/:id/min/:name" => "treks#getminimage"
 
+  match "/treks/:id/details" => "treks#getdetails"
   resources :treks
 end
