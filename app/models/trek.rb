@@ -8,16 +8,20 @@ class Trek < ActiveRecord::Base
 
   @@gpx_namespace =  {"gpx" => "http://www.topografix.com/GPX/1/1"}
 
-  # find all treks for a user,
+  ##
+  # Finds all treks for a user,
   # given the user id as argument
   # Params:
   # +id+:: the user unique identifier
-  def self.find_by_user (id)
+  ##
+  def self.find_by_user(id)
     return self.find(:all, :conditions => ["user_id = ?", id ], :order => "id DESC")
   end
 
+  ##
   # Gets images informations, by parsing the GPX file corresponding to the
   # current trek
+  ##
   def get_images_info
     ret = Array.new
     gpxFile = self.get_gpx

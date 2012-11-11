@@ -3,5 +3,6 @@
 # parameters
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :osm, "app_key", "app_secret"
+  provider :google_oauth2, 'app_key', 'app_secret', {access_type: 'online', approval_prompt: '' }
 end
 

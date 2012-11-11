@@ -20,8 +20,9 @@ application <%= link_to "OsmTracker",
 
 <%else %>
 
-  <p> In order to be able to use the application, you will need to <%= link_to "authenticate
-   using Oauth and your OpenStreetMap account", "/auth/osm" %></p>
+  <p> In order to be able to use the application, you will need to login:
+  <%= link_to "authenticate using your OpenStreetMap account", "/auth/osm" %></p>
+  <%= link_to "authenticate using your Google account", "/auth/google_oauth2" %></p>
 
 <% end %>
 
