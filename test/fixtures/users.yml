@@ -1,11 +1,5 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
-
 one:
-  uid: MyString
-  name: MyString
-  avatarurl: MyString
+  uid: 1
+  name: Pierre Mauduit
+  avatarurl: https://secure.gravatar.com/avatar/83d4fc0210fef37b47a8925632e81a60
 
-two:
-  uid: MyString
-  name: MyString
-  avatarurl: MyString

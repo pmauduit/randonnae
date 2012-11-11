@@ -1,4 +1,4 @@
-require './' + File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
 
 class TrekTest < ActiveSupport::TestCase
 
@@ -45,19 +45,19 @@ class TrekTest < ActiveSupport::TestCase
     assert last_ten.length <= 10
   end
 
+  def test_create_by_archive
+
+  end
+
 
   def test_get_images_info
     # TODO: implies loading a trek test
-    assert false
+    assert false, "Test not implemented yet"
   end
 
   def test_get_elevation_details
     # TODO: same remark
-    assert false
-  end
-
-  def test_get_img_path
-    puts get_img_path "blahblah.jpg"
+    assert false, "Test not implemented yet"
   end
 
 end

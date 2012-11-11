@@ -11,7 +11,18 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120102213602) do
+ActiveRecord::Schema.define(:version => 20121111143126) do
+
+  create_table "images", :force => true do |t|
+    t.string   "filename"
+    t.float    "latitude"
+    t.float    "longitude"
+    t.integer  "trek_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "images", ["trek_id"], :name => "index_images_on_trek_id"
 
   create_table "treks", :force => true do |t|
     t.string   "title"

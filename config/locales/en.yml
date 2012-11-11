@@ -1,4 +1,12 @@
 en:
   signed_in: "Signed in"
   signed_out: "Signed out"
+  not_logged_in_alert: "You need to log in before trying to add a trek !"
+  trek_created: "Trek successfully created."
+  trek_not_owned: "You cannot remove this trek because it does not belong to you."
+  trek_successfully_removed: "Trek successfully removed."
+  trek_not_found: "Trek not found."
+  user_not_found: "User not found."
+  user_not_found_for_trek: "User not found for trek "
+
 
