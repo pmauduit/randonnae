@@ -26,7 +26,7 @@ application <%= link_to "OsmTracker",
 
 <% end %>
 
-<% if @last_ten_treks %>
+<% unless @last_ten_treks.empty? %>
 <h3>Last added treks</h3>
   <ul id="treks">
     <% @last_ten_treks.each do |c| %>

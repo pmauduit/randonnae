@@ -23,13 +23,9 @@
             <%= image_tag current_user.avatarurl if current_user.avatarurl %>
           </div>
         <% else %>
-          Sign in using:
-          <a href="/auth/osm">
-            <%= image_tag "/assets/osm.png" %>
-          </a>
-          <a href="/auth/google_oauth2">
-            <%= image_tag "/assets/google.png" %>
-          </a>
+          <b>Sign in using:</b><br/>
+          <a href="/auth/osm"><%= image_tag "/assets/osm.png" %></a>
+          <a href="/auth/google_oauth2"><%= image_tag "/assets/google.png" %></a>
       <% end %>
     </div>
     <% flash.each do |name, msg| %>

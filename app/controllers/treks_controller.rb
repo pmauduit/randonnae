@@ -4,14 +4,18 @@ require 'RMagick'
 
 class TreksController < ApplicationController
 
-  # retrieves every treks from the database
+  ##
+  # Retrieves every treks from the database
   # TODO: pagination when the list will grow up
+  ##
   def index
     @treks = Trek.all
   end
 
-  # retrieves every treks given a user id in argument
-  def indexbyuser
+  ##
+  # Retrieves every treks given a user id in argument
+  ##
+  def index_by_user
     @user = User.find_by_id params[:id]
     unless @user.nil?
       @treks = Trek.find_by_user params[:id]
@@ -21,7 +25,7 @@ class TreksController < ApplicationController
   end
 
   # Sends the raw image
-  def getimage
+  def get_image
     @trek = Trek.find params[:id]
     if @trek == nil
       redirect_to treks_path, :alert => "Trek not found."
@@ -32,13 +36,15 @@ class TreksController < ApplicationController
         :disposition => "inline"
   end
 
+  ##
   # Sends a thumbnail of the image which filename
   # is given in argument (75x75 sized)
   # the thumbnail is generated on the fly into
   # processed/ subdirectory if it does not exist
   # yet, else it is sent as stored into the previous
   # directory
-  def getthumbnail
+  ##
+  def get_thumbnail
     @trek = Trek.find params[:id]
     if @trek.nil?
       redirect_to treks_path, :alert => "Trek not found."

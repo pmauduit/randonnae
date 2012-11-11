@@ -1,6 +1,6 @@
 require 'find'
 require 'nokogiri'
-require 'elevationparser'
+require 'elevation_parser'
 
 class Trek < ActiveRecord::Base
   belongs_to :user
@@ -15,7 +15,21 @@ class Trek < ActiveRecord::Base
   # +id+:: the user unique identifier
   ##
   def self.find_by_user(id)
-    return self.find(:all, :conditions => ["user_id = ?", id ], :order => "id DESC")
+    find(:all, :conditions => ["user_id = ?", id ], :order => "id DESC")
+  end
+
+  ##
+  # Finds the last ten uploaded treks
+  ##
+  def self.last_ten
+    find(:all, :order => "created_at desc", :limit => 10)
+  end
+
+  ##
+  # Creates a trek from a ZIP file
+  ##
+  def self.create_by_archive
+
   end
 
   ##
@@ -48,9 +62,11 @@ class Trek < ActiveRecord::Base
     return ret
   end
 
-  # Gets the elevation details, from the GPX file
+  ##
+  # Gets the elevation details from the GPX file
   # and returns an array of hashes containing
   # the elevation (ele) and the timestamp (time)
+  ##
   def get_elevation_details
     ret = Array.new
     gpxFile = self.get_gpx
@@ -65,8 +81,9 @@ class Trek < ActiveRecord::Base
 
 
 
-
+  ##
   # Gets the picture path, given its filename
+  ##
   def get_img_path (fname)
      Find.find(self.get_path) do |path|
       if File.basename(path) == fname
@@ -75,7 +92,9 @@ class Trek < ActiveRecord::Base
     end
   end
 
+  ##
   # Returns the thumbnail path, given its filename
+  ##
   def get_thumbnail (fname)
      Find.find(self.get_processed_path) do |path|
       if File.basename(path) == fname
@@ -84,7 +103,9 @@ class Trek < ActiveRecord::Base
     end
   end
 
+  ##
   # Returns the minified image path (900px), given its filename
+  ##
   def get_min_image (fname)
      Find.find(self.get_processed_path) do |path|
       if File.basename(path) == fname
@@ -93,7 +114,9 @@ class Trek < ActiveRecord::Base
     end
   end
 
+  ##
   # Returns the GPX path, given its filename
+  ##
   def get_gpx
     Find.find(self.get_path) do |path|
       if File.basename(path).end_with?(".gpx")
@@ -102,14 +125,18 @@ class Trek < ActiveRecord::Base
     end
   end
 
+  ##
   # Returns the base URL of the current trek
+  ##
   def base_url
     return "/treks/%d" % [self.id]
   end
 
+  ##
   # Returns the number of pictures that the
   # current trek contains
-  def nb_images
+  ##
+  def images_count
     ret = 0
     gpxFile = self.get_gpx
     if gpxFile
@@ -120,15 +147,19 @@ class Trek < ActiveRecord::Base
     return ret
   end
 
+  ##
   # Returns the directory path of the files
   # associated with the current trek
+  ##
   def get_path
     File.join(Rails.root, "uploads", self.user_id.to_s, self.id.to_s)
   end
 
+  ##
   # Returns the directory path of the cropped images
-  # from the pictures belonging to the current 
+  # from the pictures belonging to the current
   # trek
+  ##
   def get_processed_path
     path = File.join(Rails.root, "processed", self.user_id.to_s, self.id.to_s)
     unless File.exists? path
@@ -137,13 +168,17 @@ class Trek < ActiveRecord::Base
     path
   end
 
+  ##
   # Returns the base URL of the current trek
+  ##
   def base_url
     "/treks/%d" % [self.id]
   end
 
+  ##
   # Returns the URL of the GPX for the current
   # trek
+  ##
   def gpx_url
     self.base_url + "/gpx"
   end

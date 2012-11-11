@@ -15,7 +15,7 @@
 
 <p>Trek submitted by <%= link_to @user.name,
                                   '/treks/user/' + @user.id.to_s %></p>
-<p><%= @trek.nb_images %> images in this set.</p>
+<p><%= @trek.images_count %> images in this set.</p>
 
 <script language="javascript">
   Trek = {};

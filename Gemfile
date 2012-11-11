@@ -25,4 +25,5 @@ end
 
 group :test do
   gem 'turn', :require => false
+  gem 'simplecov'
 end
