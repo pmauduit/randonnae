@@ -4,14 +4,26 @@ require 'RMagick'
 
 class TreksController < ApplicationController
 
-  before_filter :check_logged_in, :only => [:create, :destroy, :modify]
+  before_filter :check_logged_in, :only => [ :new, :create ]
+  before_filter :check_logged_in_and_owner, :only => [ :destroy, :modify ]
+
+    def check_logged_in_and_owner
+      check_logged_in
+      trek = Trek.find(params[:id])
+      if trek.user.id != current_user.id
+        redirect_to root_url, :alert => t(:trek_not_owned)
+      end
+    end
+
+  def new
+    @trek = Trek.new
+  end
 
   ##
   # Retrieves every treks from the database
-  # TODO: pagination when the list will grow up
   ##
-  def index
-    @treks = Trek.all
+  def index(offset = 0)
+    @treks = Trek.limit(10).offset(offset)
   end
 
   ##
@@ -20,7 +32,7 @@ class TreksController < ApplicationController
   def index_by_user
     @user = User.find_by_id params[:id]
     if @user.nil?
-      redirect_to root_url, :alert => tr(:user_not_found)
+      redirect_to root_url, :alert => t(:user_not_found)
     end
   end
 
@@ -30,14 +42,12 @@ class TreksController < ApplicationController
   # subdirectory)
   ##
   def create
-    if current_user == nil
-    end
     trek = Trek.create_from_archive(current_user.id, params["trek"]["title"], params["trek"]["asset"].path)
     if trek.save
-      flash[:notice] = tr(:trek_created)
+      flash[:notice] = t(:trek_created)
       redirect_to trek
     else
-      # TODO: more info about the error ? Catching exceptions ?
+      flash[:error] = t(:error_occured)
       render :action => 'new'
     end
   end
@@ -50,10 +60,10 @@ class TreksController < ApplicationController
     unless @trek.nil?
       if @trek.user.nil?
         redirect_to treks_path,
-                    :alert => tr(:user_not_found_for_trek) + trek.title
+                    :alert => "#{t(:user_not_found_for_trek)} #{trek.title}"
       end
     else
-      redirect_to treks_path, :alert => tr(:trek_not_found)
+      redirect_to treks_path, :alert => t(:trek_not_found)
     end
   end
 
@@ -64,7 +74,7 @@ class TreksController < ApplicationController
   def get_gpx
     trek = Trek.find_by_id(params[:id])
     unless trek.nil?
-      send_file trek.get_gpx(), :type => "text/xml", :disposition => "inline"
+      send_file trek.gpx, :type => "text/xml", :disposition => "inline"
     end
   end
 
@@ -75,8 +85,9 @@ class TreksController < ApplicationController
   def get_images_info
     trek = Trek.find_by_id(params[:id])
     unless trek.nil?
-      send_file(trek.get_images_infos,
-                {:type => "application/json", :disposition => "inline"})
+      render :json => trek.images_info
+    else
+      render :json => []
     end
   end
 
@@ -97,12 +108,9 @@ class TreksController < ApplicationController
   ##
   def destroy
    @trek = Trek.find(params[:id])
-    if @trek.user_id != current_user.id
-      redirect_to :action => "index",
-        :alert => tr(:trek_not_owned)
-    end
-    @trek.destroy
-    flash[:notice] = tr(:trek_successfully_removed)
-    redirect_to :action => "index"
+   @trek.destroy
+   flash[:notice] = t(:trek_successfully_removed)
+   redirect_to :action => "index"
   end
+
 end

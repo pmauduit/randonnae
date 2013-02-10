@@ -4,15 +4,14 @@ Randonnae::Application.routes.draw do
   match "/auth/:provider/callback" => "sessions#create"
   match "/signout" => "sessions#destroy", :as => :signout
 
-  match "/treks/:id/gpx" => "treks#getgpx"
-  match "/treks/:id/imgs" => "treks#getimagesinfo"
+  match "/treks/:id/gpx" => "treks#get_gpx"
+  match "/treks/:id/imgs" => "treks#get_images_info"
   match "/treks/user/:id" => "treks#index_by_user"
+  match "/treks/:id/details" => "treks#get_elevation_details"
 
-  match "/treks/:id/picture/:name" => "treks#getimage"
+  match "/treks/:trek_id/picture/:image_id" => "images#get_image"
+  match "/treks/:trek_id/thumbnail/:image_id" => "images#get_thumbnail"
+  match "/treks/:trek_id/min/:image_id" => "images#get_min_image"
 
-  match "/treks/:id/thumbnail/:name" => "treks#getthumbnail"
-  match "/treks/:id/min/:name" => "treks#getminimage"
-
-  match "/treks/:id/details" => "treks#getdetails"
   resources :treks
 end

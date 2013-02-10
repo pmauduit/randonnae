@@ -13,8 +13,8 @@
 
 <p><%= link_to "Back to treks", treks_path %></p>
 
-<p>Trek submitted by <%= link_to @user.name,
-                                  '/treks/user/' + @user.id.to_s %></p>
+<p>Trek submitted by <%= link_to @trek.user.name,
+                                  '/treks/user/' + @trek.user.id.to_s %></p>
 <p><%= @trek.images_count %> images in this set.</p>
 
 <script language="javascript">
@@ -43,7 +43,7 @@
   </div>
 </center>
 
-<% if current_user && current_user.id == @user.id %>
+<% if current_user && current_user.id == @trek.user.id %>
   <h3>Delete trek</h3>
   <br/>
   <%= button_to "Remove trek", { :action => "destroy", :id => @trek.id },

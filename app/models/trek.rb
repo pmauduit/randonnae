@@ -6,7 +6,7 @@ class Trek < ActiveRecord::Base
   belongs_to :user
   validates :title, :presence => true
 
-  has_many :images
+  has_many :images, :dependent => :destroy
 
   before_destroy :remove_files
 
@@ -16,8 +16,10 @@ class Trek < ActiveRecord::Base
   # Array for the expected image file extensions
   JPEG_EXT = [ ".jpg", ".JPG", ".JPEG", ".jpeg" ]
 
+  # Array for the expected GPX extensions
+  GPX_EXT = [ ".gpx", ".GPX" ]
   # Array for the expected extensions into the ZIP archive
-  AUTHORIZED_EXT =  [".gpx", ".GPX" ].concat JPEG_EXT
+  AUTHORIZED_EXT =  GPX_EXT.concat JPEG_EXT
 
   ##
   # Finds all treks for a user,
@@ -37,6 +39,13 @@ class Trek < ActiveRecord::Base
   end
 
   ##
+  # Gets the GPX path
+  ##
+  def gpx
+    @gpx ||= compute_gpx_path
+  end
+
+  ##
   # Creates a trek from a ZIP file
   ##
   def self.create_from_archive(user_id, trek_title, zip_path)
@@ -44,10 +53,12 @@ class Trek < ActiveRecord::Base
     trek.title = trek_title
     trek.user_id = user_id
 
-    gpx_img_infos = get_images_info_from_gpx
+    # Pre-saves the trek so that we have an identifier
+    trek.save!
 
-    newDir = get_path
-    newpDir = get_processed_path
+
+    newDir = trek.path
+    newpDir = trek.processed_path
     FileUtils.mkdir_p newDir
     FileUtils.mkdir_p newpDir
     Zip::Archive.open(zip_path) do |ar|
@@ -63,27 +74,40 @@ class Trek < ActiveRecord::Base
           open(curfile, 'wb') do |f|
             f << zf.read
           end
-          # creates the underlying image objects
-          if JPEG_EXT.include? File.extname(curfile)
-            begin
-              Magick::Image::read(curfile)
-              matched = gpx_img_infos.select { |i| i.filename == File.basename(curfile) }
-              next if matched.nil?
-              matched = matched.first
-
-              img = Image.new( :filename => matched.filename,
-                               :latitude => matched.latitude,
-                               :longitude => matched.longitude,
-                               :trek_id => id )
-              img.save
-            rescue Magick::ImageMagickError
-              log.info "Skipping bad image file"
-              FileUtils.rm curfile
-            end
-          end
         end
       end
     end
+
+    # Parsing every image files
+    gpx_img_infos = trek.get_images_info_from_gpx
+
+    Find.find(trek.path) do |path|
+      if JPEG_EXT.include? File.extname(path)
+        begin
+          Magick::Image::read(path)
+          puts "file.path: #{path}"
+          matched = gpx_img_infos.select { |i| File.basename(i['filename']) == File.basename(path) }
+          # TODO: add them anyway but with unknown lat/lon ?
+          if matched.nil? || matched.empty?
+            img = Image.new(:filename => path)
+            img.trek_id = trek.id
+            img.save!
+          else
+            matched = matched.first
+            img = Image.new( :filename => path,
+                            :latitude => matched['lat'],
+                            :longitude => matched['lon']
+                           )
+            img.trek_id = trek.id
+            img.save!
+          end
+        rescue Magick::ImageMagickError
+          log.info "Skipping bad image file"
+          FileUtils.rm curfile
+        end
+      end
+    end
+
     trek
   end
 
@@ -93,7 +117,7 @@ class Trek < ActiveRecord::Base
   ##
   def get_images_info_from_gpx
     ret = Array.new
-    gpxFile = self.get_gpx
+    gpxFile = gpx
     if gpxFile
       @doc = Nokogiri::XML(File.open(gpxFile))
       wayPts = @doc.xpath '//gpx:wpt', GPX_NAMESPACE
@@ -104,7 +128,7 @@ class Trek < ActiveRecord::Base
           elem = Hash.new
           filename = wpt.xpath('./gpx:link/gpx:text', GPX_NAMESPACE).first.inner_text
           datetime = wpt.xpath('./gpx:time', GPX_NAMESPACE).first.inner_text
-          elem['filename']  = self.base_url + '/picture/' + filename
+          elem['filename']  = filename
           elem['thumbnail'] = self.base_url + '/thumbnail/' + filename
           elem['minimage']  = self.base_url + '/min/' + filename
           elem['lat'] = wpt['lat']
@@ -118,21 +142,29 @@ class Trek < ActiveRecord::Base
   end
 
   ##
-  # Gets image info
+  # Gets the images info for the current trek
   ##
-  def get_images_info
-    img_json = get_processed_path + "/img.json"
-    unless File.exists? img_json
-      ret = get_images_info_from_gpx
-      # TODO: adds here the logic to scan
-      # the images without info into the GPX
-      processed_img = File.new(img_json, "w")
-      processed_img.write ret.to_json
-      processed_img.close
-    end
-    img_json
+  def images_info
+      ret = []
+      images.each do |i|
+        # <Image id: 99, 
+        # filename: "/treks/44/picture/2011-12-11_10-44-36.jpg",
+        # latitude: 45.40352712,
+        # longitude: 5.90387236,
+        # trek_id: 44,
+        # created_at: "2013-01-19 23:16:44",
+        # updated_at: "2013-01-19 23:16:44">
+        # to_add['filename'] = "#{self.base_url}/picture/#{i.filename}
+        current_img = {}
+        current_img['filename'] = i.image_url
+        current_img['thumbnail'] = i.thumbnail_url
+        current_img['minimage'] = i.min_url
+        current_img['lat'] = i.latitude
+        current_img['lon'] = i.longitude
+        ret << current_img
+      end
+      ret
   end
-
   ##
   # Gets the elevation details from the GPX file
   # and returns an array of hashes containing
@@ -142,10 +174,10 @@ class Trek < ActiveRecord::Base
   # the processed/ directory)
   ##
   def get_elevation_details
-    ele_json = get_processed_path + "/ele.json"
+    ele_json = processed_path + "/ele.json"
     unless File.exists? ele_json
       ele_details = Array.new
-      gpxFile = get_gpx
+      gpxFile = gpx
       if gpxFile
         eleparser = ElevationParser.new
         parser = XML::SAX::Parser.new(eleparser)
@@ -157,17 +189,6 @@ class Trek < ActiveRecord::Base
       processed_ele.close
     end
     ele_json
-  end
-
-  ##
-  # Returns the GPX path, given its filename
-  ##
-  def get_gpx
-    Find.find(get_path) do |path|
-      if File.basename(path).end_with?(".gpx")
-        return path
-      end
-    end
   end
 
   ##
@@ -184,8 +205,8 @@ class Trek < ActiveRecord::Base
   #
   # they are stored into uploads/[user_id]/[trek_id]/
   ##
-  def get_path
-    path = File.join(Rails.root, "uploads", user_id.to_s, id.to_s)
+  def path
+    @path ||= File.join(Rails.root, "uploads", user_id.to_s, id.to_s)
   end
 
   ##
@@ -194,15 +215,15 @@ class Trek < ActiveRecord::Base
   #
   # These files are stored into processed/[user_id]/[trek_id]/
   ##
-  def get_processed_path
-    File.join(Rails.root, "processed", user_id.to_s, id.to_s)
+  def processed_path
+    @processed_path ||= File.join(Rails.root, "processed", user_id.to_s, id.to_s)
   end
 
   ##
   # Returns the base URL of the current trek
   ##
   def base_url
-    "/treks/%d" % [id]
+    @base_url ||= "/treks/%d" % [id]
   end
 
   ##
@@ -210,15 +231,28 @@ class Trek < ActiveRecord::Base
   # trek
   ##
   def gpx_url
-    self.base_url + "/gpx"
+    @gpx_url ||= "#{base_url}/gpx"
   end
 
   ##
   # Removes the files associated with the current trek
   ##
   def remove_files
-    FileUtils.rm_rf get_path
-    FileUtils.rm_rf get_processed_path
+    FileUtils.rm_rf path
+    FileUtils.rm_rf processed_path
+  end
+
+  private
+
+  ##
+  # Returns the GPX path, given its filename
+  ##
+  def compute_gpx_path
+    Find.find(path) do |p|
+      if GPX_EXT.include? File.extname(p)
+        return p
+      end
+    end
   end
 
 end

@@ -2,12 +2,12 @@
   <h1>New trek</h1>
 
   <p>
-  <%= form_for @trek do |t| %>
+  <%= form_for Trek.new do |t| %>
 
     <%= t.label :title, "Title" %>
-    <%= t.text_field :title %><br/>
+    <%= t.text_field :title, :required => true %><br/>
     <%= t.label :asset, "File (zip containing GPX and pictures)" %>
-    <%= t.file_field :asset %><br/>
+    <%= t.file_field :asset, :required => true %><br/>
     <%= t.submit %>
   <% end %>
  </p>
