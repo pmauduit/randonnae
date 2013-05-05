@@ -13,11 +13,11 @@ class Image < ActiveRecord::Base
   end
 
   def thumbnail_url
-      @image_url ||= "/treks/#{trek.id}/thumbnail/#{id}"
+      @thumbnail_url ||= "/treks/#{trek.id}/thumbnail/#{id}"
   end
 
   def min_url
-      @image_url ||= "/treks/#{trek.id}/min/#{id}"
+      @min_url ||= "/treks/#{trek.id}/min/#{id}"
   end
 
   ##
@@ -32,7 +32,7 @@ class Image < ActiveRecord::Base
     unless File.exist?(@thumbnail)
       generate_miniature(@thumbnail, THUMBNAIL_DIMENSION)
     end
-    thumb_path
+    @thumbnail
   end
 
   ##
@@ -47,7 +47,7 @@ class Image < ActiveRecord::Base
     unless File.exist?(@min_image)
       generate_miniature(@min_image, MIN_IMAGE_DIMENSION)
    end
-   min_path
+   @min_image
   end
 
   private

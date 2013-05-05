@@ -30,8 +30,21 @@
 
 <h3 id="gallery">Gallery</h3>
 <center>
-<div id="carousel" class="jcarousel-skin-tango">
-  <ul></ul>
+<div id="carousel" class="jcarousel jcarousel-skin-tango">
+  <ul class="jcarousel-list">
+  <% @trek.images.each do |i| %>
+    <%=  content_tag(:li) do
+           content_tag(:a, :href => i.min_url) do
+             if (i.latitude) && (i.longitude)
+               image_tag(i.thumbnail_url, :onmouseover => "Trek.hover(#{i.latitude},#{i.longitude})")
+             else
+               image_tag(i.thumbnail_url, :onmouseover => "Trek.unknown_location()")
+             end
+           end
+         end
+    %>
+  <% end %>
+  </ul>
 </div>
 </center>
 
