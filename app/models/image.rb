@@ -9,17 +9,20 @@ class Image < ActiveRecord::Base
   THUMBNAIL_DIMENSION = 75
 
   def image_url
-      @image_url ||= "/treks/#{trek.id}/picture/#{id}"
+      @image_url ||= "/image/raw/#{id}"
   end
 
   def thumbnail_url
-      @thumbnail_url ||= "/treks/#{trek.id}/thumbnail/#{id}"
+      @thumbnail_url ||= "/image/thumbnail/#{id}"
   end
 
   def min_url
-      @min_url ||= "/treks/#{trek.id}/min/#{id}"
+      @min_url ||= "/image/min/#{id}"
   end
 
+  def name
+    @name ||= File.basename(filename, File.extname(filename))
+  end
   ##
   # Returns the path to thumbnail of the image (75x75 sized).
   #

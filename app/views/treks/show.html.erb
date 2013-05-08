@@ -1,6 +1,6 @@
 <% title @trek.title %>
 
-
+<%= javascript_include_tag "/jquery-migrate-1.0.0.js" %>
 <%= javascript_include_tag "/OpenLayers.js"  %>
 <%= javascript_include_tag "/jquery.jcarousel.min.js" %>
 <%= javascript_include_tag "/lightbox/js/jquery.lightbox-0.5.min.js" %>
@@ -13,8 +13,7 @@
 
 <p><%= link_to "Back to treks", treks_path %></p>
 
-<p>Trek submitted by <%= link_to @trek.user.name,
-                                  '/treks/user/' + @trek.user.id.to_s %></p>
+<p>Trek submitted by <%= link_to(@trek.user.name, "/treks/user/#{@trek.user.id.to_s}") %></p>
 <p><%= @trek.images_count %> images in this set.</p>
 
 <script language="javascript">
@@ -34,13 +33,17 @@
   <ul class="jcarousel-list">
   <% @trek.images.each do |i| %>
     <%=  content_tag(:li) do
-           content_tag(:a, :href => i.min_url) do
+           #content_tag(:a, :href => i.min_url) do
              if (i.latitude) && (i.longitude)
-               image_tag(i.thumbnail_url, :onmouseover => "Trek.hover(#{i.latitude},#{i.longitude})")
+               image_tag(i.thumbnail_url, :class => "jcarousel-item", :width => 75,
+                         :height => 75, :onmouseover => "Trek.hover(#{i.latitude},#{i.longitude})",
+                         :onclick => "Trek.load_image_details(#{i.id})")
              else
-               image_tag(i.thumbnail_url, :onmouseover => "Trek.unknown_location()")
+               image_tag(i.thumbnail_url, :class => "jcarousel-item", :width => 75, :height => 75,
+                         :onmouseover => "Trek.unknown_location()",
+                         :onclick => "Trek.load_image_details(#{i.id})")
              end
-           end
+           #end
          end
     %>
   <% end %>
@@ -48,13 +51,18 @@
 </div>
 </center>
 
-<h3>Trek details</h3>
-<p><i>Here is an elevation graph, but remember, elevation from GPS units are known to be unaccurate !</i></p>
-<center>
-  <div id="trekdetails">
-    <div id="trekgraph" style="width: 600px; height: 300px;"></div>
-  </div>
-</center>
+<div id="image-info">
+</div>
+
+<div id="trek-details">
+  <h3>Trek details</h3>
+  <p><i>Here is an elevation graph, but remember, elevation from GPS units are known to be inaccurate !</i></p>
+  <center>
+    <div id="trekdetails">
+      <div id="trekgraph" style="width: 600px; height: 300px;"></div>
+    </div>
+  </center>
+</div>
 
 <% if current_user && current_user.id == @trek.user.id %>
   <h3>Delete trek</h3>

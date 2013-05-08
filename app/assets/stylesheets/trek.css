@@ -14,3 +14,18 @@ div#background-wrap img {
   display: none;
 }
 
+img.jcarousel-item { cursor: hand; cursor: pointer; }
+
+div#image-info > img {
+  margin-right: 40px;
+  float: left;
+}
+
+div#image-links {
+  width: 160px;
+  margin-left: 140px;
+}
+
+div#trek-details {
+  clear: both;
+}

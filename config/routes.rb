@@ -9,9 +9,10 @@ Randonnae::Application.routes.draw do
   match "/treks/user/:id" => "treks#index_by_user"
   match "/treks/:id/details" => "treks#get_elevation_details"
 
-  match "/treks/:trek_id/picture/:image_id" => "images#get_image"
-  match "/treks/:trek_id/thumbnail/:image_id" => "images#get_thumbnail"
-  match "/treks/:trek_id/min/:image_id" => "images#get_min_image"
+  match "/image/raw/:image_id" => "images#get_image"
+  match "/image/thumbnail/:image_id" => "images#get_thumbnail"
+  match "/image/min/:image_id" => "images#get_min_image"
+  match "/image/details/:image_id" => "images#get_image_infos"
 
   resources :treks
 end

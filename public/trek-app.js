@@ -1,6 +1,43 @@
 
 $(document).ready(function() {
 
+
+  Trek.load_image_details = function(img_id) {
+    div_img_info = $('#image-info');
+    div_img_info.empty();
+
+     $.getJSON("/image/details/" + img_id, function(data) {
+       $('<h3>').text("Image details").appendTo(div_img_info);
+       console.log(data);
+        $('<img>', { 'src': data.thumbnail_url }).appendTo(div_img_info);
+        div_img_links = $('<div>', {'id': "image-links"});
+        url_min = $('<a>', { 'href': data.min_url, 'class': 'lightboxed' }).text("Miniature image");
+        url_raw = $('<a>', { 'href': data.raw_url }).text("original image");
+        if ((data.latitude == null) || (data.longitude == null)) {
+          coords_span = $('<span>', { 'class': 'img-info-unkn-coords' }).text("unknown coordinates !");
+        } else {
+          coords_span = $('<span>', { 'class': 'img-info-coords' }).text("Latitude: " + data.latitude + " Longitude: " + data.longitude);
+        }
+
+        $('<h4>', { 'class': 'image-name' }).text(data.name).appendTo(div_img_links);
+        url_min.appendTo(div_img_links);
+        $('<br/>').appendTo(div_img_links);
+        url_raw.appendTo(div_img_links);
+        $('<br/>').appendTo(div_img_links);
+        coords_span.appendTo(div_img_links);
+        $('<br/>').appendTo(div_img_links);
+
+        div_img_links.appendTo(div_img_info);
+
+        $('a.lightboxed').lightBox({
+          fixedNavigation:true
+        });
+
+    });
+
+
+  }
+
   Trek.unknown_location = function() {
     if (Trek.poi_layer === 'undefined') {
       return;
@@ -86,14 +123,13 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-  $('#carousel').jcarousel({
-    'list': '.jcarousel-list'
+  $('.jcarousel').jcarousel({
+    'items': '.jcarousel-item',
+    scroll: 1,
+    visible: 5,
+    animation: 300,
+    auto: 8
   });
-    // Lightbox
-    $(function() {
-      $('#carousel a').lightBox({
-        fixedNavigation:true
-      });
-    });
 });
+
 
