@@ -56,6 +56,7 @@ div#user_avatar {
   margin-top: 20px;
   position: relative;
   padding-top: 40px;
+  opacity: 0.93;
 }
 
 #flash_notice, #flash_error, #flash_alert {

@@ -77,38 +77,42 @@ class Trek < ActiveRecord::Base
         end
       end
     end
+    trek.create_image_informations
+    trek
+  end
 
+  ##
+  # Creates underlying image objects
+  ##
+  def create_image_informations
     # Parsing every image files
-    gpx_img_infos = trek.get_images_info_from_gpx
+    gpx_img_infos = get_images_info_from_gpx
 
-    Find.find(trek.path) do |path|
-      if JPEG_EXT.include? File.extname(path)
+    Find.find(path) do |p|
+      if JPEG_EXT.include? File.extname(p)
         begin
-          Magick::Image::read(path)
-          puts "file.path: #{path}"
-          matched = gpx_img_infos.select { |i| File.basename(i['filename']) == File.basename(path) }
-          # TODO: add them anyway but with unknown lat/lon ?
+          Magick::Image::read(p)
+          matched = gpx_img_infos.select { |i| File.basename(i['filename']) == File.basename(p) }
           if matched.nil? || matched.empty?
-            img = Image.new(:filename => path)
-            img.trek_id = trek.id
+            img = Image.new(:filename => p)
+            img.trek_id = id
             img.save!
           else
             matched = matched.first
-            img = Image.new( :filename => path,
-                            :latitude => matched['lat'],
-                            :longitude => matched['lon']
-                           )
-            img.trek_id = trek.id
+            img = Image.new({ :filename => p,
+                              :latitude => matched['lat'],
+                              :longitude => matched['lon'] })
+            img.trek_id = id
             img.save!
           end
         rescue Magick::ImageMagickError
           log.info "Skipping bad image file"
-          FileUtils.rm curfile
+          FileUtils.rm(curfile)
         end
       end
     end
 
-    trek
+
   end
 
   ##

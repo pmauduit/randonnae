@@ -26,6 +26,21 @@ div#image-links {
   margin-left: 140px;
 }
 
+div#image-links h4 {
+  margin-bottom: 0px;
+}
+
+div#image-links a {
+  color: #000;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 12px;
+}
+
 div#trek-details {
   clear: both;
+}
+span.img-info-coords {
+  font-size: 10px;
+  text-decoration: italic;
 }

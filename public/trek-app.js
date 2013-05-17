@@ -16,7 +16,8 @@ $(document).ready(function() {
         if ((data.latitude == null) || (data.longitude == null)) {
           coords_span = $('<span>', { 'class': 'img-info-unkn-coords' }).text("unknown coordinates !");
         } else {
-          coords_span = $('<span>', { 'class': 'img-info-coords' }).text("Latitude: " + data.latitude + " Longitude: " + data.longitude);
+          coords_span = $('<span>', { 'class': 'img-info-coords' }).text("Latitude: " +
+            data.latitude.toFixed(2) + " Longitude: " + data.longitude.toFixed(2));
         }
 
         $('<h4>', { 'class': 'image-name' }).text(data.name).appendTo(div_img_links);
